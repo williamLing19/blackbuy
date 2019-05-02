@@ -11,10 +11,14 @@ import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 
 //写组件
+//首页组件
 import index from "./components/index.vue"
+//详情组件
+import detail from "./components/detail.vue"
 //写规则
 const routes = [
-  { path: "/index", component: index }
+  { path: "/index", component: index },
+  { path: "/detail/:id", component: detail }
 ]
 //创建router实例
 const router = new VueRouter({

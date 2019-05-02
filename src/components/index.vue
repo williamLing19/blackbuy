@@ -43,7 +43,7 @@
           <div class="left-705">
             <el-carousel height="341px">
               <el-carousel-item v-for="item in sliderlist" :key="item.id">
-                <img class="slider-img" :src="item.img_url" alt="">
+                <img class="slider-img" :src="item.img_url" alt>
               </el-carousel-item>
             </el-carousel>
           </div>
@@ -69,7 +69,11 @@
       <div class="main-tit">
         <h2>{{item.catetitle}}</h2>
         <p>
-          <a href="/goods/43.html" v-for="(it, i) in item.level2catelist" :key="i">{{it.subcatetitle}}</a>
+          <a
+            href="/goods/43.html"
+            v-for="(it, i) in item.level2catelist"
+            :key="i"
+          >{{it.subcatetitle}}</a>
           <a href="/goods/40.html">
             更多
             <i>+</i>
@@ -80,11 +84,10 @@
         <div class="wrap-box">
           <ul class="img-list">
             <li v-for="(item, index) in item.datas" :key="index">
-              <a href="#/site/goodsinfo/87" class>
+              <!-- <a href="#/site/goodsinfo/87" class> -->
+              <router-link :to="'/detail/'+item.artID">
                 <div class="img-box">
-                  <img
-                    :src="item.img_url"
-                  >
+                  <img :src="item.img_url">
                 </div>
                 <div class="info">
                   <h3>{{item.artTitle}}</h3>
@@ -99,14 +102,13 @@
                     </span>
                   </p>
                 </div>
-              </a>
+                <!-- </a> -->
+              </router-link>
             </li>
-            
           </ul>
         </div>
       </div>
     </div>
-    
   </div>
 </template>
 
@@ -119,7 +121,7 @@ export default {
       catelist: [],
       sliderlist: [],
       toplist: [],
-      sectionList:[]
+      sectionList: []
     };
   },
   //vue-chrome插件中可以看到name属性
@@ -129,19 +131,19 @@ export default {
     axios
       .get("http://111.230.232.110:8899/site/goods/gettopdata/goods")
       .then(res => {
-        console.log(res);
+        // console.log(res);
         this.catelist = res.data.message.catelist;
         this.sliderlist = res.data.message.sliderlist;
         this.toplist = res.data.message.toplist;
       });
 
     //调用分页商品
-    axios.get("http://111.230.232.110:8899/site/goods/getgoodsgroup")
-    .then(res=>{
-      console.log(res);
-      this.sectionList=res.data.message
-      
-    })
+    axios
+      .get("http://111.230.232.110:8899/site/goods/getgoodsgroup")
+      .then(res => {
+        // console.log(res);
+        this.sectionList = res.data.message;
+      });
   },
   filters: {
     formatTime(value) {
