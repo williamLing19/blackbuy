@@ -205,7 +205,7 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 import moment from "moment";
 export default {
   name: "detail",
@@ -227,8 +227,8 @@ export default {
     // console.log(this.$route.params.id);
     const id = this.$route.params.id;
     //获取id,发送请求
-    axios
-      .get(`http://111.230.232.110:8899/site/goods/getgoodsinfo/${id}`)
+     this.$axios
+      .get(`/site/goods/getgoodsinfo/${id}`)
       .then(res => {
         // console.log(res);
         this.hotgoodslist = res.data.message.hotgoodslist;
@@ -242,9 +242,9 @@ export default {
         this.$message.error("写点啥呗!!!");
       } else {
         //有东西发送请求
-        axios
+         this.$axios
           .post(
-            `http://111.230.232.110:8899/site/validate/comment/post/goods/${
+            `/site/validate/comment/post/goods/${
               this.$route.params.id
             }`,
             {
@@ -263,9 +263,9 @@ export default {
     },
     //将获取评论抽取为一个方法多次调用
     getcomments() {
-      axios
+       this.$axios
         .get(
-          `http://111.230.232.110:8899/site/comment/getbypage/goods/${
+          `/site/comment/getbypage/goods/${
             this.$route.params.id
           }?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`
         )

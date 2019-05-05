@@ -113,7 +113,7 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 import moment from "moment";
 export default {
   data() {
@@ -128,8 +128,8 @@ export default {
   //作用是利于调试
   name: "index",
   created() {
-    axios
-      .get("http://111.230.232.110:8899/site/goods/gettopdata/goods")
+    this.$axios
+      .get("/site/goods/gettopdata/goods")
       .then(res => {
         // console.log(res);
         this.catelist = res.data.message.catelist;
@@ -138,8 +138,8 @@ export default {
       });
 
     //调用分页商品
-    axios
-      .get("http://111.230.232.110:8899/site/goods/getgoodsgroup")
+     this.$axios
+      .get("/site/goods/getgoodsgroup")
       .then(res => {
         // console.log(res);
         this.sectionList = res.data.message;
