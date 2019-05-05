@@ -13,7 +13,13 @@
         <div class="wrap-box">
           <div class="left-925">
             <div class="goods-box clearfix">
-              <div class="pic-box"></div>
+              <div class="pic-box">
+                <el-carousel height="150px">
+                  <el-carousel-item v-for="item in imglist" :key="item.id">
+                    <img :src="item.original_path" alt>
+                  </el-carousel-item>
+                </el-carousel>
+              </div>
               <div class="goods-spec">
                 <h1>{{goodsinfo.title}}</h1>
                 <p class="subtitle">{{goodsinfo.sub_title}}</p>
@@ -93,17 +99,23 @@
                 class="tab-head"
                 style="position: static; top: 517px; width: 925px;"
               >
+                <!-- tab切换 -->
                 <ul>
                   <li>
-                    <a href="javascript:;" class="selected">商品介绍</a>
+                    <a href="javascript:;" @click="index=1" :class="{selected:index==1}">商品介绍</a>
                   </li>
                   <li>
-                    <a href="javascript:;">商品评论</a>
+                    <a href="javascript:;" @click="index=2" :class="{selected:index==2}">商品评论</a>
                   </li>
                 </ul>
               </div>
-              <div class="tab-content entry" style="display: block;" v-html="goodsinfo.content"></div>
-              <div class="tab-content" style="display: block;">
+              <div
+                class="tab-content entry"
+                style="display: block;"
+                v-html="goodsinfo.content"
+                v-show="index==1"
+              ></div>
+              <div class="tab-content" style="display: block;" v-show="index==2">
                 <div class="comment-box">
                   <div id="commentForm" name="commentForm" class="form-box">
                     <div class="avatar-box">
@@ -117,6 +129,7 @@
                           sucmsg=" "
                           data-type="*10-1000"
                           nullmsg="请填写评论内容！"
+                          v-model.trim="comments"
                         ></textarea>
                         <span class="Validform_checktip"></span>
                       </div>
@@ -127,6 +140,7 @@
                           type="submit"
                           value="提交评论"
                           class="submit"
+                          @click="postcomments"
                         >
                         <span class="Validform_checktip"></span>
                       </div>
@@ -136,37 +150,29 @@
                     <p
                       style="margin: 5px 0px 15px 69px; line-height: 42px; text-align: center; border: 1px solid rgb(247, 247, 247);"
                     >暂无评论，快来抢沙发吧！</p>
-                    <li>
+                    <li v-for="(item, index) in commentsList" :key="index">
                       <div class="avatar-box">
                         <i class="iconfont icon-user-full"></i>
                       </div>
                       <div class="inner-box">
                         <div class="info">
-                          <span>匿名用户</span>
-                          <span>2017/10/23 14:58:59</span>
+                          <span>{{item.user_name}}</span>
+                          <span>{{item.add_time|formatTime}}</span>
                         </div>
-                        <p>testtesttest</p>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="avatar-box">
-                        <i class="iconfont icon-user-full"></i>
-                      </div>
-                      <div class="inner-box">
-                        <div class="info">
-                          <span>匿名用户</span>
-                          <span>2017/10/23 14:59:36</span>
-                        </div>
-                        <p>很清晰调动单很清晰调动单</p>
+                        <p>{{item.content}}</p>
                       </div>
                     </li>
                   </ul>
                   <div class="page-box" style="margin: 5px 0px 0px 62px;">
-                    <div id="pagination" class="digg">
-                      <span class="disabled">« 上一页</span>
-                      <span class="current">1</span>
-                      <span class="disabled">下一页 »</span>
-                    </div>
+                    <el-pagination
+                      @size-change="handleSizeChange"
+                      @current-change="handleCurrentChange"
+                      :current-page="pageIndex"
+                      :page-sizes="[5, 10, 15, 20]"
+                      :page-size="pageSize"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :total="totalcount"
+                    ></el-pagination>
                   </div>
                 </div>
               </div>
@@ -180,9 +186,7 @@
                   <li v-for="(item, index) in hotgoodslist" :key="index">
                     <div class="img-box">
                       <a href="#/site/goodsinfo/90" class>
-                        <img
-                          :src="item.img_url"
-                        >
+                        <img :src="item.img_url">
                       </a>
                     </div>
                     <div class="txt-box">
@@ -190,7 +194,6 @@
                       <span>{{item.add_time|formatTime}}</span>
                     </div>
                   </li>
-                  
                 </ul>
               </div>
             </div>
@@ -205,31 +208,87 @@
 import axios from "axios";
 import moment from "moment";
 export default {
-    name:"detail",
-    data(){
-      return {
-        hotgoodslist:[],
-        goodsinfo:{},
-        imglist:[]
+  name: "detail",
+  data() {
+    return {
+      hotgoodslist: [],
+      goodsinfo: {},
+      imglist: [],
+      index: 1,
+      comments: "",
+      pageSize: 10,
+      pageIndex: 1,
+      commentsList: [],
+      totalcount: 0
+    };
+  },
+  created() {
+    this.getcomments();
+    // console.log(this.$route.params.id);
+    const id = this.$route.params.id;
+    //获取id,发送请求
+    axios
+      .get(`http://111.230.232.110:8899/site/goods/getgoodsinfo/${id}`)
+      .then(res => {
+        // console.log(res);
+        this.hotgoodslist = res.data.message.hotgoodslist;
+        this.goodsinfo = res.data.message.goodsinfo;
+        this.imglist = res.data.message.imglist;
+      });
+  },
+  methods: {
+    postcomments() {
+      if (!this.comments) {
+        this.$message.error("写点啥呗!!!");
+      } else {
+        //有东西发送请求
+        axios
+          .post(
+            `http://111.230.232.110:8899/site/validate/comment/post/goods/${
+              this.$route.params.id
+            }`,
+            {
+              commenttxt: this.comments
+            }
+          )
+          .then(res => {
+            // console.log(res);
+            if (res.data.status == 0) {
+              this.$message.success(res.data.message);
+              this.getcomments();
+            }
+          });
       }
+      this.comments = "";
     },
-    created(){
-        // console.log(this.$route.params.id);
-        const id=this.$route.params.id
-        //获取id,发送请求
-        axios.get(`http://111.230.232.110:8899/site/goods/getgoodsinfo/${id}`)
-        .then(res=>{
+    //将获取评论抽取为一个方法多次调用
+    getcomments() {
+      axios
+        .get(
+          `http://111.230.232.110:8899/site/comment/getbypage/goods/${
+            this.$route.params.id
+          }?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`
+        )
+        .then(res => {
           console.log(res);
-          this.hotgoodslist=res.data.message.hotgoodslist
-          this.goodsinfo=res.data.message.goodsinfo
-          this.imglist=res.data.message.imglist
-        })
+          this.commentsList = res.data.message;
+          this.totalcount = res.data.totalcount;
+        });
     },
-    filters:{
-      formatTime(value){
-        return moment(value).format("YYYY年MM月DD日")
-      }
+    handleSizeChange(size) {
+      this.pageSize = size;
+      this.getcomments();
+    },
+    handleCurrentChange(current) {
+      this.pageIndex = current;
+      this.getcomments();
     }
+  },
+  filters: {
+    formatTime(value) {
+      return moment(value).format("YYYY年MM月DD日");
+    }
+  }
 };
 </script>
 
@@ -237,5 +296,22 @@ export default {
 .tab-content img {
   display: block;
   width: 100%;
+}
+.pic-box .el-carousel__item {
+  width: 395px;
+  height: 320px;
+}
+.pic-box .el-carousel__item img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.pic-box {
+  width: 395px;
+  height: 320px;
+}
+.pic-box .el-carousel {
+  width: 100%;
+  height: 100%;
 }
 </style>
