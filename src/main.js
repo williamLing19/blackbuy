@@ -22,6 +22,7 @@ import index from "./components/index.vue"
 import detail from "./components/detail.vue"
 //写规则
 const routes = [
+  { path: "/", redirect: "/index" },
   { path: "/index", component: index },
   { path: "/detail/:id", component: detail }
 ]
