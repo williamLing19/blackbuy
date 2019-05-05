@@ -20,11 +20,23 @@ axios.defaults.baseURL = 'http://111.230.232.110:8899';
 import index from "./components/index.vue"
 //详情组件
 import detail from "./components/detail.vue"
+//会员中心组件
+import centerContainer from "./components/centerContainer.vue"
+//会员鼓励师组件
+import vipgls from './components/vipgls.vue'
 //写规则
 const routes = [
   { path: "/", redirect: "/index" },
   { path: "/index", component: index },
-  { path: "/detail/:id", component: detail }
+  { path: "/detail/:id", component: detail },
+  { path: "/centerContainer", component: centerContainer, 
+    children:[
+      {
+        path:'vipgls',
+        component:vipgls
+      }
+    ]  
+  },
 ]
 //创建router实例
 const router = new VueRouter({
