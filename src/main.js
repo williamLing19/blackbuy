@@ -24,6 +24,10 @@ import detail from "./components/detail.vue"
 import centerContainer from "./components/centerContainer.vue"
 //会员鼓励师组件
 import vipgls from './components/vipgls.vue'
+//订单列表
+import vipOrderDetail from './components/vipOrderDetail.vue'
+//订单详情
+import vipDetail from './components/vipDetail.vue'
 //写规则
 const routes = [
   { path: "/", redirect: "/index" },
@@ -34,6 +38,18 @@ const routes = [
       {
         path:'vipgls',
         component:vipgls
+      },
+      {
+        path:'/vipOrderDetail',
+        component:vipOrderDetail
+      },
+      {
+        path:'/vipDetail',
+        component:vipDetail
+      },
+      {
+        path:'',
+        redirect: "vipgls"
       }
     ]  
   },

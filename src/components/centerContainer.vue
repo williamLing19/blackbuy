@@ -31,9 +31,11 @@
                       </h2>
                       <div class="list">
                         <p>
-                          <a href="#/site/member/orderlist" class>
+                          <!-- <a href="#/site/member/orderlist" class> -->
+                          <router-link to="/vipOrderDetail">
                             <i class="iconfont icon-arrow-right"></i>交易订单
-                          </a>
+                          </router-link>
+                          <!-- </a> -->
                         </p>
                       </div>
                     </li>
@@ -70,7 +72,7 @@
               </div>
             </div>
             <div class="right-auto">
-            <router-view></router-view>
+              <router-view></router-view>
             </div>
           </div>
         </div>
