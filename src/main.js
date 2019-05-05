@@ -9,22 +9,12 @@ Vue.use(VueRouter)
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
-//导入axios
-import axios from "axios"
-//放到原型上方便使用
-Vue.prototype.$axios=axios
-axios.defaults.baseURL = 'http://111.230.232.110:8899';
 
 //写组件
-//首页组件
 import index from "./components/index.vue"
-//详情组件
-import detail from "./components/detail.vue"
 //写规则
 const routes = [
-  { path: "/", redirect: "/index" },
-  { path: "/index", component: index },
-  { path: "/detail/:id", component: detail }
+  { path: "/index", component: index }
 ]
 //创建router实例
 const router = new VueRouter({
