@@ -113,8 +113,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import moment from "moment";
+// import axios from "axios";
+// import moment from "moment";
 export default {
   data() {
     return {
@@ -128,7 +128,7 @@ export default {
   //作用是利于调试
   name: "index",
   created() {
-    axios
+    this.$axios
       .get("http://111.230.232.110:8899/site/goods/gettopdata/goods")
       .then(res => {
         // console.log(res);
@@ -138,19 +138,19 @@ export default {
       });
 
     //调用分页商品
-    axios
+    this.$axios
       .get("http://111.230.232.110:8899/site/goods/getgoodsgroup")
       .then(res => {
         // console.log(res);
         this.sectionList = res.data.message;
       });
   },
-  filters: {
-    formatTime(value) {
-      // return  value.split("T")[0]
-      return moment(value).format("YYYY年MM月DD日");
-    }
-  }
+  // filters: {
+  //   formatTime(value) {
+  //     // return  value.split("T")[0]
+  //     return moment(value).format("YYYY年MM月DD日");
+  //   }
+  // }
 };
 </script>
 

@@ -46,35 +46,12 @@
                     <dt>购买数量</dt>
                     <dd>
                       <div class="stock-box">
-                        <div class="el-input-number el-input-number--small">
-                          <span role="button" class="el-input-number__decrease is-disabled">
-                            <i class="el-icon-minus"></i>
-                          </span>
-                          <span role="button" class="el-input-number__increase">
-                            <i class="el-icon-plus"></i>
-                          </span>
-                          <div class="el-input el-input--small">
-                            <!---->
-                            <input
-                              autocomplete="off"
-                              size="small"
-                              type="text"
-                              rows="2"
-                              max="60"
-                              min="1"
-                              validateevent="true"
-                              class="el-input__inner"
-                              role="spinbutton"
-                              aria-valuemax="60"
-                              aria-valuemin="1"
-                              aria-valuenow="1"
-                              aria-disabled="false"
-                            >
-                            <!---->
-                            <!---->
-                            <!---->
-                          </div>
-                        </div>
+                        <el-input-number
+                          v-model="num"
+                          :min="1"
+                          :max="goodsinfo.stock_quantity"
+                          label="描述文字"
+                        ></el-input-number>
                       </div>
                       <span class="stock-txt">
                         库存
@@ -205,8 +182,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import moment from "moment";
+// import axios from "axios";
+// import moment from "moment";
 export default {
   name: "detail",
   data() {
@@ -219,7 +196,8 @@ export default {
       pageSize: 10,
       pageIndex: 1,
       commentsList: [],
-      totalcount: 0
+      totalcount: 0,
+      num:1
     };
   },
   created() {
@@ -227,7 +205,7 @@ export default {
     // console.log(this.$route.params.id);
     const id = this.$route.params.id;
     //获取id,发送请求
-    axios
+    this.$axios
       .get(`http://111.230.232.110:8899/site/goods/getgoodsinfo/${id}`)
       .then(res => {
         // console.log(res);
@@ -242,7 +220,7 @@ export default {
         this.$message.error("写点啥呗!!!");
       } else {
         //有东西发送请求
-        axios
+        this.$axios
           .post(
             `http://111.230.232.110:8899/site/validate/comment/post/goods/${
               this.$route.params.id
@@ -263,7 +241,7 @@ export default {
     },
     //将获取评论抽取为一个方法多次调用
     getcomments() {
-      axios
+      this.$axios
         .get(
           `http://111.230.232.110:8899/site/comment/getbypage/goods/${
             this.$route.params.id
@@ -284,11 +262,11 @@ export default {
       this.getcomments();
     }
   },
-  filters: {
-    formatTime(value) {
-      return moment(value).format("YYYY年MM月DD日");
-    }
-  }
+  // filters: {
+  //   formatTime(value) {
+  //     return moment(value).format("YYYY年MM月DD日");
+  //   }
+  // }
 };
 </script>
 
