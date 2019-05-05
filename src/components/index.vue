@@ -50,7 +50,7 @@
           <!--/幻灯片-->
           <div class="left-220">
             <ul class="side-img-list">
-              <li v-for="(item, index) in toplist" :key="index">
+              <li v-for="(item, index) in toplist"  :key="index">
                 <div class="img-box">
                   <label>{{index+1}}</label>
                   <img :src="item.img_url">
@@ -80,7 +80,8 @@
         <div class="wrap-box">
           <ul class="img-list">
             <li v-for="(item, index) in item.datas" :key="index">
-              <a href="#/site/goodsinfo/87" class>
+              <!-- <a href="#/site/goodsinfo/87" class> -->
+              <router-link :to="'/detail/'+item.artID">
                 <div class="img-box">
                   <img
                     :src="item.img_url"
@@ -99,7 +100,8 @@
                     </span>
                   </p>
                 </div>
-              </a>
+              <!-- </a> -->
+              </router-link>
             </li>
             
           </ul>
@@ -111,8 +113,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import moment from "moment";
+// import axios from "axios";
+// import moment from "moment";
 export default {
   data() {
     return {
@@ -126,29 +128,29 @@ export default {
   //作用是利于调试
   name: "index",
   created() {
-    axios
-      .get("http://111.230.232.110:8899/site/goods/gettopdata/goods")
+    this.$axios
+      .get("/site/goods/gettopdata/goods")
       .then(res => {
-        console.log(res);
+        // console.log(res);
         this.catelist = res.data.message.catelist;
         this.sliderlist = res.data.message.sliderlist;
         this.toplist = res.data.message.toplist;
       });
 
     //调用分页商品
-    axios.get("http://111.230.232.110:8899/site/goods/getgoodsgroup")
+    this.$axios.get("/site/goods/getgoodsgroup")
     .then(res=>{
-      console.log(res);
+      // console.log(res);
       this.sectionList=res.data.message
       
     })
   },
-  filters: {
-    formatTime(value) {
-      // return  value.split("T")[0]
-      return moment(value).format("YYYY年MM月DD日");
-    }
-  }
+  // filters: {
+  //   formatTime(value) {
+  //     // return  value.split("T")[0]
+  //     return moment(value).format("YYYY年MM月DD日");
+  //   }
+  // }
 };
 </script>
 

@@ -46,35 +46,12 @@
                     <dt>购买数量</dt>
                     <dd>
                       <div class="stock-box">
-                        <div class="el-input-number el-input-number--small">
-                          <span role="button" class="el-input-number__decrease is-disabled">
-                            <i class="el-icon-minus"></i>
-                          </span>
-                          <span role="button" class="el-input-number__increase">
-                            <i class="el-icon-plus"></i>
-                          </span>
-                          <div class="el-input el-input--small">
-                            <!---->
-                            <input
-                              autocomplete="off"
-                              size="small"
-                              type="text"
-                              rows="2"
-                              max="60"
-                              min="1"
-                              validateevent="true"
-                              class="el-input__inner"
-                              role="spinbutton"
-                              aria-valuemax="60"
-                              aria-valuemin="1"
-                              aria-valuenow="1"
-                              aria-disabled="false"
-                            >
-                            <!---->
-                            <!---->
-                            <!---->
-                          </div>
-                        </div>
+                        <el-input-number
+                          v-model="num"
+                          :min="1"
+                          :max="goodsinfo.stock_quantity"
+                          label="描述文字"
+                        ></el-input-number>
                       </div>
                       <span class="stock-txt">
                         库存
@@ -185,12 +162,15 @@
                 <ul class="side-img-list">
                   <li v-for="(item, index) in hotgoodslist" :key="index">
                     <div class="img-box">
-                      <a href="#/site/goodsinfo/90" class>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">
                         <img :src="item.img_url">
-                      </a>
+                      </router-link>
+                      <!-- </a> -->
                     </div>
                     <div class="txt-box">
-                      <a href="#/site/goodsinfo/90" class>{{item.title}}</a>
+                      <!-- <a href="#/site/goodsinfo/90" class>{{item.title}}</a> -->
+                      <router-link :to="'/detail/'+item.id">{{item.title}}</router-link>
                       <span>{{item.add_time|formatTime}}</span>
                     </div>
                   </li>
@@ -206,7 +186,7 @@
 
 <script>
 // import axios from "axios";
-import moment from "moment";
+// import moment from "moment";
 export default {
   name: "detail",
   data() {
@@ -219,38 +199,41 @@ export default {
       pageSize: 10,
       pageIndex: 1,
       commentsList: [],
-      totalcount: 0
+      totalcount: 0,
+      num: 1
     };
+  },
+  watch: {
+    "$route.params.id"() {
+      this.getDetail();
+      this.getcomments();
+    }
   },
   created() {
     this.getcomments();
-    // console.log(this.$route.params.id);
-    const id = this.$route.params.id;
-    //获取id,发送请求
-     this.$axios
-      .get(`/site/goods/getgoodsinfo/${id}`)
-      .then(res => {
-        // console.log(res);
-        this.hotgoodslist = res.data.message.hotgoodslist;
-        this.goodsinfo = res.data.message.goodsinfo;
-        this.imglist = res.data.message.imglist;
-      });
+    this.getDetail()
   },
   methods: {
+    //获取右侧 数据
+    getDetail() {
+      this.$axios
+        .get(`/site/goods/getgoodsinfo/${this.$route.params.id}`)
+        .then(res => {
+          // console.log(res);
+          this.hotgoodslist = res.data.message.hotgoodslist;
+          this.goodsinfo = res.data.message.goodsinfo;
+          this.imglist = res.data.message.imglist;
+        });
+    },
     postcomments() {
       if (!this.comments) {
         this.$message.error("写点啥呗!!!");
       } else {
         //有东西发送请求
-         this.$axios
-          .post(
-            `/site/validate/comment/post/goods/${
-              this.$route.params.id
-            }`,
-            {
-              commenttxt: this.comments
-            }
-          )
+        this.$axios
+          .post(`/site/validate/comment/post/goods/${this.$route.params.id}`, {
+            commenttxt: this.comments
+          })
           .then(res => {
             // console.log(res);
             if (res.data.status == 0) {
@@ -263,14 +246,14 @@ export default {
     },
     //将获取评论抽取为一个方法多次调用
     getcomments() {
-       this.$axios
+      this.$axios
         .get(
-          `/site/comment/getbypage/goods/${
-            this.$route.params.id
-          }?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`
+          `/site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${
+            this.pageIndex
+          }&pageSize=${this.pageSize}`
         )
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.commentsList = res.data.message;
           this.totalcount = res.data.totalcount;
         });
@@ -283,12 +266,12 @@ export default {
       this.pageIndex = current;
       this.getcomments();
     }
-  },
-  filters: {
-    formatTime(value) {
-      return moment(value).format("YYYY年MM月DD日");
-    }
   }
+  // filters: {
+  //   formatTime(value) {
+  //     return moment(value).format("YYYY年MM月DD日");
+  //   }
+  // }
 };
 </script>
 
