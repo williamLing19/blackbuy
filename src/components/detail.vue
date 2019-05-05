@@ -162,12 +162,16 @@
                 <ul class="side-img-list">
                   <li v-for="(item, index) in hotgoodslist" :key="index">
                     <div class="img-box">
-                      <a href="#/site/goodsinfo/90" class>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">
                         <img :src="item.img_url">
-                      </a>
+                      </router-link>
+                      <!-- </a> -->
                     </div>
                     <div class="txt-box">
-                      <a href="#/site/goodsinfo/90" class>{{item.title}}</a>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">{{item.title}}</router-link>
+                      <!-- </a> -->
                       <span>{{item.add_time|formatTime}}</span>
                     </div>
                   </li>
@@ -197,7 +201,7 @@ export default {
       pageIndex: 1,
       commentsList: [],
       totalcount: 0,
-      num:1
+      num: 1
     };
   },
   created() {
@@ -205,14 +209,34 @@ export default {
     // console.log(this.$route.params.id);
     const id = this.$route.params.id;
     //获取id,发送请求
-    this.$axios
-      .get(`http://111.230.232.110:8899/site/goods/getgoodsinfo/${id}`)
-      .then(res => {
+    this.$axios.get(`/site/goods/getgoodsinfo/${id}`).then(res => {
+      // console.log(res);
+      this.hotgoodslist = res.data.message.hotgoodslist;
+      this.goodsinfo = res.data.message.goodsinfo;
+      this.imglist = res.data.message.imglist;
+    });
+  },
+  watch: {
+    "$route.params.id"(nv, ov) {
+      this.$axios.get(`/site/goods/getgoodsinfo/${nv}`).then(res => {
         // console.log(res);
         this.hotgoodslist = res.data.message.hotgoodslist;
         this.goodsinfo = res.data.message.goodsinfo;
         this.imglist = res.data.message.imglist;
       });
+      //重新获取评论
+      this.$axios
+        .get(
+          `/site/comment/getbypage/goods/${nv}?pageIndex=${
+            this.pageIndex
+          }&pageSize=${this.pageSize}`
+        )
+        .then(res => {
+          console.log(res);
+          this.commentsList = res.data.message;
+          this.totalcount = res.data.totalcount;
+        });
+    }
   },
   methods: {
     postcomments() {
@@ -221,14 +245,9 @@ export default {
       } else {
         //有东西发送请求
         this.$axios
-          .post(
-            `http://111.230.232.110:8899/site/validate/comment/post/goods/${
-              this.$route.params.id
-            }`,
-            {
-              commenttxt: this.comments
-            }
-          )
+          .post(`/site/validate/comment/post/goods/${this.$route.params.id}`, {
+            commenttxt: this.comments
+          })
           .then(res => {
             // console.log(res);
             if (res.data.status == 0) {
@@ -243,9 +262,9 @@ export default {
     getcomments() {
       this.$axios
         .get(
-          `http://111.230.232.110:8899/site/comment/getbypage/goods/${
-            this.$route.params.id
-          }?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`
+          `/site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${
+            this.pageIndex
+          }&pageSize=${this.pageSize}`
         )
         .then(res => {
           console.log(res);
@@ -261,7 +280,7 @@ export default {
       this.pageIndex = current;
       this.getcomments();
     }
-  },
+  }
   // filters: {
   //   formatTime(value) {
   //     return moment(value).format("YYYY年MM月DD日");
